@@ -1,0 +1,110 @@
+
+
+<!-- BEGIN: media-query-body-class.inc -->
+
+<!--
+  DRUPAL EXAMPLE USAGE:
+
+  1. Add *this* file to your theme folder:
+     [your-theme]/js/media-query-body-class.inc
+
+  2. See CONFIGURE (below) to define your body class names.
+
+  3. Include the file from the top of:
+     [your-theme]/templates/page.tpl
+
+  4. Like so...
+     // Include our media-query-body class mojo...
+     <$php include __DIR__ . '/../js/media-query-body-class.inc'; $>
+-->
+
+  <style class="mq-classes" id="mq-classes-definition" type="text/css">
+    /* CONFIGURE: Add, remove, update the following media queries as you
+       see fit. Change thier "content" attribute to define the body class
+       that will be applied when the given media query is in effect. */
+    @media only screen and (min-width: 840px) {
+      .mq-classes{ content: "forGrid12";}
+    }
+    @media only screen and (min-width: 481px) and (max-width: 839px) {
+      .mq-classes{ content: "forGrid6";}
+    }
+    @media only screen and (max-width: 480px){
+      .mq-classes{ content: "forGrid2";}
+    }
+  </style>
+  <script>
+    // This accompanying js does the magic but contains no configs. It can be left as is.
+    function initMqBodyClassing(){
+      // Do it once when called.
+      updateMqClassOnBody();
+      // Do it again on any page resize. Note: a 'debounce' is applied to onresize
+      // via a native js version of this well documented jquery plugin:
+      // https://github.com/louisremi/jquery-smartresize/blob/master/README.md
+      var mqDebounce = function (func, threshold, execAsap) {
+          var mqTimeout;
+          return function mqDebounced () {
+              var obj = this, args = arguments;
+              function mqDelayed () {
+                  if (!execAsap)
+                      func.apply(obj, args);
+                  mqTimeout = null;
+              };
+              if (mqTimeout)
+                  clearTimeout(mqTimeout);
+              else if (execAsap)
+                  func.apply(obj, args);
+              mqTimeout = setTimeout(mqDelayed, threshold || 100);
+          };
+      }
+      window.onresize = mqDebounce(function (e) {
+        updateMqClassOnBody();
+      }, 50, true);  // debounce timing here
+    };
+
+    function updateMqClassOnBody(){
+      // Debug // alert('BODY CLASS BEFORE: \n' + document.body.getAttribute('class'));
+      activeMqClass = ' ' + getActiveMqClass() + ' '; // Explicitly space padded for simple removal.
+      if (document.body.getAttribute('class').indexOf(activeMqClass) == -1) {
+        bodyClasses = removeMqClassesFrom(document.body.getAttribute('class'));
+        bodyClasses += activeMqClass;
+        document.body.setAttribute('class', bodyClasses);
+        // Debug //alert('BODY CLASS AFTER: \n' + document.body.getAttribute('class'));
+      }
+    }
+
+    function getActiveMqClass(){
+      contentVal = window.getComputedStyle(document.getElementById('mq-classes-definition')).content;
+      contentVal = contentVal.replace(/"/g, ''); // Strip surrounding quotes in FF
+      return contentVal;
+    }
+
+    function getAllMqClasses(){
+      // Parse the data once and store it global
+      if(typeof window.MqClassNames === 'undefined'){
+        var styleTag = document.getElementById ('mq-classes-definition');
+        // x-browser friendly way to get the style sheet as a dom object.
+        var sheet = styleTag.sheet ? styleTag.sheet : styleTag.styleSheet;
+        // Parse the stylesheet to get each class name.
+        var mqNames = new Array();
+        for (var i=0; i < sheet.cssRules.length; i++){
+          mqNames[i] = (sheet.cssRules[i].cssRules[0].style.content).replace(/"/g, '');
+        }
+        window.MqClassNames = mqNames;
+      }
+      return window.MqClassNames;
+    }
+
+    function removeMqClassesFrom(str){
+        mqClasses = getAllMqClasses();
+        for (var i = 0; i < mqClasses.length; i++){
+          // Assumes they were explicitly space padded for simple removal.
+          mqClass = ' ' + mqClasses[i] + ' ';
+          str = str.replace(mqClass, '');
+        }
+        return str;
+    }
+
+    // To get things going.
+    initMqBodyClassing();
+  </script>
+<!-- /END: media-query-body-class.inc -->
