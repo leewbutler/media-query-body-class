@@ -1,24 +1,18 @@
+
 <!-- BEGIN: media-query-body-class.inc -->
-
-<!--
-  DRUPAL EXAMPLE USAGE:
-
-  1. Add *this* file to your theme folder:
-     [your-theme]/js/media-query-body-class.inc
-
-  2. See CONFIGURE (below) to define your body class names.
-
-  3. Include the file from the top of:
-     [your-theme]/templates/page.tpl
-
-  4. Like so...
-     // Include our media-query-body class mojo...
-     <$php include __DIR__ . '/../js/media-query-body-class.inc.htm'; $>
+<!-- VERY BASIC EXAMPLE USAGE FOR DRUPAL:
+  1. Define your body class names in the CONFIG section below.
+  2. Add *this* file to your theme's JS folder at:
+          [your-theme]/js/media-query-body-class.inc
+  3. Include the file after the <body> tag, likely in:
+         [your-theme]/templates/page.tpl
+  4. It can be include with a call like...
+         // Include the media-query-body class file from the js folder.
+         <$php include __DIR__ . '/../js/media-query-body-class.inc.htm'; $>
 -->
-
-  <style class="mq-classes" id="mq-classes-definition" type="text/css">
-    /* CONFIGURE: Add, remove, update the following media queries as you
-       see fit. Change thier "content" attribute to define the body class
+  <style class="mq-classes" id="mq-classes-config" type="text/css">
+    /* CONFIG: Add, remove, update the following media queries as you
+       see fit. Change the "content" attribute to define the body class
        that will be applied when the given media query is in effect. */
     @media only screen and (min-width: 840px) {
       .mq-classes{ content: "forGrid12";}
@@ -31,7 +25,7 @@
     }
   </style>
   <script type="text/javascript">
-    // This accompanying js does the magic but contains no configs. It can be left as is.
+    // This accompanying js contains no configs. It can be left as is.
     function initMqBodyClassing(){
       // Do it once when called.
       updateMqClassOnBody();
@@ -71,7 +65,7 @@
     }
 
     function getActiveMqClass(){
-      contentVal = window.getComputedStyle(document.getElementById('mq-classes-definition')).content;
+      contentVal = window.getComputedStyle(document.getElementById('mq-classes-config')).content;
       contentVal = contentVal.replace(/"/g, ''); // Strip surrounding quotes in FF
       return contentVal;
     }
@@ -79,7 +73,7 @@
     function getAllMqClasses(){
       // Parse the data once and store it global
       if(typeof window.MqClassNames === 'undefined'){
-        var styleTag = document.getElementById ('mq-classes-definition');
+        var styleTag = document.getElementById ('mq-classes-config');
         // x-browser friendly way to get the style sheet as a dom object.
         var sheet = styleTag.sheet ? styleTag.sheet : styleTag.styleSheet;
         // Parse the stylesheet to get each class name.
@@ -101,7 +95,6 @@
         }
         return str;
     }
-
     // To get things going.
     initMqBodyClassing();
   </script>
