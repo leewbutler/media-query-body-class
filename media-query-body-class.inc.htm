@@ -1,19 +1,20 @@
 
 <!-- BEGIN: media-query-body-class.inc -->
 <!-- VERY BASIC EXAMPLE USAGE FOR DRUPAL:
-  1. Define your body class names in the CONFIG section below.
-  2. Add *this* file to your theme's JS folder at:
+  1. See "CONFIG" below to define your body class names.
+  2. After CONFIG, add this file to your theme's JS folder at:
           [your-theme]/js/media-query-body-class.inc
-  3. Include the file after the <body> tag, likely in:
-         [your-theme]/templates/page.tpl
-  4. It can be include with a call like...
-         // Include the media-query-body class file from the js folder.
+  3. Then include the file in your html at some point after the <body> tag,
+     for example, from within this tpl:   [your-theme]/templates/page.tpl
+  4. ...you can open with this call to include the file:
+         // Include our media-query-body class file from the js folder.
          <$php include __DIR__ . '/../js/media-query-body-class.inc.htm'; $>
 -->
-  <style class="mq-classes" id="mq-classes-config" type="text/css">
-    /* CONFIG: Add, remove, update the following media queries as you
-       see fit. Change the "content" attribute to define the body class
-       that will be applied when the given media query is in effect. */
+  <style id="mq-classes-config" class="mq-classes" type="text/css">
+    /* CONFIG: Modify the media queries below to fit your needs.
+       Each media query should contain (only) a different value for
+       the .mq-classes "content" attribute. This value will be applied
+       to the <body> class when the given media query is in effect. */
     @media only screen and (min-width: 840px) {
       .mq-classes{ content: "forGrid12";}
     }
@@ -27,10 +28,10 @@
   <script type="text/javascript">
     // This accompanying js contains no configs. It can be left as is.
     function initMqBodyClassing(){
-      // Do it once when called.
+      // Update the body class once when called.
       updateMqClassOnBody();
-      // Do it again on any page resize. Note: a 'debounce' is applied to onresize
-      // via a native js version of this well documented jquery plugin:
+      // Register to update the body class again on window resize. Register it through
+      // the following "native js" debounce function, inspired by this jquery plugin:
       // https://github.com/louisremi/jquery-smartresize/blob/master/README.md
       var mqDebounce = function (func, threshold, execAsap) {
           var mqTimeout;
@@ -48,14 +49,15 @@
               mqTimeout = setTimeout(mqDelayed, threshold || 100);
           };
       }
+      // Register it.
       window.onresize = mqDebounce(function (e) {
         updateMqClassOnBody();
-      }, 50, true);  // debounce timing here
+      }, 50, true);  // option to adjust debounce timing here
     };
 
     function updateMqClassOnBody(){
       // Debug // alert('BODY CLASS BEFORE: \n' + document.body.getAttribute('class'));
-      activeMqClass = ' ' + getActiveMqClass() + ' '; // Explicitly space padded for simple removal.
+      activeMqClass = ' ' + getActiveMqClass() + ' '; // Explicitly space padded for simple removal later.
       if (document.body.getAttribute('class').indexOf(activeMqClass) == -1) {
         bodyClasses = removeMqClassesFrom(document.body.getAttribute('class'));
         bodyClasses += activeMqClass;
@@ -66,12 +68,13 @@
 
     function getActiveMqClass(){
       contentVal = window.getComputedStyle(document.getElementById('mq-classes-config')).content;
-      contentVal = contentVal.replace(/"/g, ''); // Strip surrounding quotes in FF
+      // Replace strips potential surrounding quotes
+      contentVal = contentVal.replace(/"/g, '');
       return contentVal;
     }
 
     function getAllMqClasses(){
-      // Parse the data once and store it global
+      // Parse once then store it global
       if(typeof window.MqClassNames === 'undefined'){
         var styleTag = document.getElementById ('mq-classes-config');
         // x-browser friendly way to get the style sheet as a dom object.
@@ -79,6 +82,7 @@
         // Parse the stylesheet to get each class name.
         var mqNames = new Array();
         for (var i=0; i < sheet.cssRules.length; i++){
+          // Replace strips potential surrounding quotes
           mqNames[i] = (sheet.cssRules[i].cssRules[0].style.content).replace(/"/g, '');
         }
         window.MqClassNames = mqNames;
@@ -89,13 +93,13 @@
     function removeMqClassesFrom(str){
         mqClasses = getAllMqClasses();
         for (var i = 0; i < mqClasses.length; i++){
-          // Assumes they were explicitly space padded for simple removal.
+          // Assumes classes were explicitly space padded for simple removal.
           mqClass = ' ' + mqClasses[i] + ' ';
           str = str.replace(mqClass, '');
         }
         return str;
     }
-    // To get things going.
+    // Now one simple init call to get things going...
     initMqBodyClassing();
   </script>
 <!-- /END: media-query-body-class.inc -->
