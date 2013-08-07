@@ -1,4 +1,3 @@
-
 <!-- BEGIN: media-query-body-class.inc -->
 <!-- VERY BASIC EXAMPLE USAGE FOR DRUPAL:
   1. See "CONFIG" below to define your body class names.
@@ -9,6 +8,9 @@
   4. ...you can open with this call to include the file:
          // Include our media-query-body class file from the js folder.
          <$php include __DIR__ . '/../js/media-query-body-class.inc.htm'; $>
+  TODO: Make a drupal specific version, package as module, which   writes
+        the INITIAL <body> class to the page SERVER-SIDE, as welll as emmiting
+        this js to manage body class changes thereafter on the CLIENT-SIDE.
 -->
   <style id="mq-classes-config" class="mq-classes" type="text/css">
     /* CONFIG: Modify the media queries below to fit your needs.
