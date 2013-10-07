@@ -1,22 +1,11 @@
-<!-- BEGIN: media-query-body-class.inc -->
-<!-- VERY BASIC EXAMPLE USAGE FOR DRUPAL:
-  1. See "CONFIG" below to define your body class names.
-  2. After CONFIG, add this file to your theme's JS folder at:
-          [your-theme]/js/media-query-body-class.inc
-  3. Then include the file in your html at some point after the <body> tag,
-     for example, from within this tpl:   [your-theme]/templates/page.tpl
-  4. ...you can open with this call to include the file:
-         // Include our media-query-body class file from the js folder.
-         <$php include __DIR__ . '/../js/media-query-body-class.inc.htm'; $>
-  TODO: Make a drupal specific version, package as module, which writes
-        the INITIAL <body> class to the page SERVER-SIDE, as welll as emmiting
-        this js to manage body class changes thereafter on the CLIENT-SIDE.
--->
+<!-- BEGIN: xmedia-query-body-class.html include -->
   <style id="mq-classes-config" class="mq-classes" type="text/css">
-    /* CONFIG: Modify the media queries below to fit your needs.
-       Each media query should contain (only) a different value for
-       the .mq-classes "content" attribute. This value will be applied
-       to the <body> class when the given media query is in effect. */
+    /* -------------- BEGIN CONFIG -------------
+       Modify the css media queries below to fit your needs. The value for the
+       "content" attribute will be used as the <body> class when the given media
+       query is in effect allowing you to scope all responsive style to the body
+       class rather then repeating the media query throughout your responsive
+       html. */
     @media only screen and (min-width: 840px) {
       .mq-classes{ content: "forGrid12";}
     }
@@ -26,15 +15,22 @@
     @media only screen and (max-width: 480px){
       .mq-classes{ content: "forGrid2";}
     }
+    /*  -------------- END CONFIG ------------- */
   </style>
   <script type="text/javascript">
-    // This accompanying js contains no configs. It can be left as is.
+
+    // The following native js fires inline before page load.
+    // It contains no configs and can/should be left unchanged.
+
+    // TODO: Add IE8 or lower detection and instead parse the above settings
+    // since media quiries are flatly ignored in IE8 and lower.
+
     function initMqBodyClassing(){
       // Update the body class once when called.
       updateMqClassOnBody();
-      // Register to update the body class again on window resize. Register it through
-      // the following "native js" debounce function, inspired by this jquery plugin:
-      // https://github.com/louisremi/jquery-smartresize/blob/master/README.md
+      // Register to re-update the body class again on window resize. We register it
+      // through the following "native js" debounce function, inspired by this jquery
+      // plugin:  https://github.com/louisremi/jquery-smartresize/blob/master/README.md
       var mqDebounce = function (func, threshold, execAsap) {
           var mqTimeout;
           return function mqDebounced () {
@@ -101,7 +97,7 @@
         }
         return str;
     }
-    // Now one simple init call to get things going...
+    // Init mq body classing to get things going...
     initMqBodyClassing();
   </script>
-<!-- /END: media-query-body-class.inc -->
+<!-- /END: xmedia-query-body-class.html include -->
